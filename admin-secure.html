@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Donations</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1a1f36 0%, #0f1419 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: white;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Login Screen */
+        .login-screen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 80vh;
+        }
+
+        .login-box {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 50px;
+            border: 1px solid rgba(255,255,255,0.2);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .login-box h2 {
+            font-size: 2em;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .login-field {
+            margin-bottom: 25px;
+        }
+
+        .login-field label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .login-field input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            background: rgba(255,255,255,0.05);
+            color: white;
+            font-size: 1em;
+        }
+
+        .login-field input:focus {
+            outline: none;
+            border-color: #8B5CF6;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4);
+        }
+
+        .error-msg {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.5);
+            color: #FCA5A5;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            text-align: center;
+            display: none;
+        }
+
+        .error-msg.show {
+            display: block;
+        }
+
+        /* Dashboard */
+        .dashboard {
+            display: none;
+        }
+
+        .dashboard.show {
+            display: block;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 50px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .back-link, .logout-btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 10px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.1);
+            cursor: pointer;
+        }
+
+        .back-link:hover, .logout-btn:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateY(-2px);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            margin-bottom: 50px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.15);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255,255,255,0.25);
+        }
+
+        .stat-card.purple {
+            background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%);
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
+        }
+
+        .stat-card.green {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .stat-card.blue {
+            background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .stat-card.amber {
+            background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.3);
+        }
+
+        .stat-card.cyan {
+            background: linear-gradient(135deg, #06B6D4 0%, #0891B2 100%);
+            box-shadow: 0 4px 20px rgba(6, 182, 212, 0.3);
+        }
+
+        .stat-icon {
+            font-size: 1.5em;
+            margin-bottom: 8px;
+            opacity: 0.95;
+        }
+
+        .stat-title {
+            font-size: 0.75em;
+            opacity: 0.95;
+            margin-bottom: 6px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 1.6em;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .admin-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .admin-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.95em;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .admin-btn.edit {
+            background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .admin-btn.reset {
+            background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
+
+        .admin-btn.export {
+            background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+
+        .admin-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .section-title {
+            font-size: 1.6em;
+            margin-bottom: 25px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .donations-container {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 35px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .donations-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .donations-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .donation-item {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 20px 24px;
+            display: grid;
+            grid-template-columns: 50px 1fr auto;
+            align-items: center;
+            gap: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .donation-item:hover {
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(255,255,255,0.2);
+            transform: translateX(-4px);
+        }
+
+        .donation-number {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .donation-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .donor-name {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: white;
+        }
+
+        .donation-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.85em;
+            color: rgba(255,255,255,0.6);
+        }
+
+        .case-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            background: rgba(102, 126, 234, 0.2);
+            border-radius: 6px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: #a8b7ff;
+        }
+
+        .donation-amount {
+            font-size: 1.4em;
+            font-weight: 800;
+            color: #10B981;
+            letter-spacing: -0.5px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .empty-state p {
+            font-size: 1.1em;
+            margin-bottom: 8px;
+        }
+
+        /* Edit Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: #1a1f36;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .modal-title {
+            font-size: 1.8em;
+            margin-bottom: 25px;
+            font-weight: 700;
+        }
+
+        .modal-field {
+            margin-bottom: 20px;
+        }
+
+        .modal-field label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .modal-field input, .modal-field textarea, .modal-field select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            background: rgba(255,255,255,0.05);
+            color: white;
+            font-family: 'Inter', sans-serif;
+            font-size: 1em;
+        }
+
+        .modal-field textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .modal-btn.save {
+            background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+            color: white;
+        }
+
+        .modal-btn.cancel {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .donation-item {
+                grid-template-columns: 40px 1fr;
+                gap: 15px;
+            }
+
+            .donation-amount {
+                grid-column: 2;
+                justify-self: start;
+                margin-top: 10px;
+            }
+
+            .header {
+                text-align: center;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .stat-card, .donation-item {
+            animation: fadeIn 0.5s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-box">
+            <h2>🔐 Admin Login</h2>
+            <div class="login-field">
+                <label>Password</label>
+                <input type="password" id="passwordInput" placeholder="Enter admin password">
+            </div>
+            <button class="login-btn" onclick="login()">Login</button>
+            <div class="error-msg" id="errorMsg">Incorrect password. Try again.</div>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="container dashboard" id="dashboard">
+        <div class="header">
+            <h1>🎯 Admin Dashboard</h1>
+            <div class="header-actions">
+                <a href="donation-final.html" class="back-link">← Back to Donations</a>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+
+        <div class="stats-grid" id="stats-grid">
+            <!-- Stats will be generated by JavaScript -->
+        </div>
+
+        <div class="donations-container">
+            <div class="donations-header">
+                <h2 class="section-title">💝 Donation Log</h2>
+                <div class="admin-controls">
+                    <button class="admin-btn edit" onclick="openEditModal()">
+                        ✏️ Edit Cases
+                    </button>
+                    <button class="admin-btn reset" onclick="confirmReset()">
+                        🔄 Reset All Data
+                    </button>
+                    <button class="admin-btn export" onclick="exportToCSV()" id="export-btn">
+                        📥 Export CSV
+                    </button>
+                </div>
+            </div>
+
+            <div class="donations-list" id="donations-list">
+                <!-- Donations will be generated by JavaScript -->
+            </div>
+
+            <div class="empty-state" id="empty-state" style="display: none;">
+                <div class="empty-state-icon">📭</div>
+                <p style="font-size: 1.3em; font-weight: 600;">No donations yet</p>
+                <p style="opacity: 0.7;">Donations will appear here when people start contributing</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-title">Edit Cases</h2>
+            <div class="modal-field">
+                <label>Select Case</label>
+                <select id="edit-case-select" onchange="loadCaseData()">
+                    <option value="1">Case 1</option>
+                    <option value="2">Case 2</option>
+                    <option value="3">Case 3</option>
+                </select>
+            </div>
+            <div class="modal-field">
+                <label>Title</label>
+                <input type="text" id="edit-title">
+            </div>
+            <div class="modal-field">
+                <label>Description</label>
+                <textarea id="edit-description"></textarea>
+            </div>
+            <div class="modal-field">
+                <label>Target Amount</label>
+                <input type="number" id="edit-target">
+            </div>
+            <div class="modal-field">
+                <label>Collected Amount</label>
+                <input type="number" id="edit-collected">
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn save" onclick="saveEdit()">Save Changes</button>
+                <button class="modal-btn cancel" onclick="closeEditModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== ADMIN PASSWORD ==========
+        const ADMIN_PASSWORD = 'admin123'; // Change this to your secure password
+        // ====================================
+        
+        // ========== GOOGLE SHEETS CONFIGURATION ==========
+        const GOOGLE_SHEETS_URL = '';
+        const USE_GOOGLE_SHEETS = false;
+        // =================================================
+
+        let cases = {};
+        let donations = [];
+        let isAuthenticated = false;
+
+        // Check if already logged in
+        function checkAuth() {
+            const auth = sessionStorage.getItem('adminAuth');
+            if (auth === 'true') {
+                isAuthenticated = true;
+                showDashboard();
+            }
+        }
+
+        // Login function
+        function login() {
+            const password = document.getElementById('passwordInput').value;
+            if (password === ADMIN_PASSWORD) {
+                isAuthenticated = true;
+                sessionStorage.setItem('adminAuth', 'true');
+                showDashboard();
+            } else {
+                document.getElementById('errorMsg').classList.add('show');
+                setTimeout(() => {
+                    document.getElementById('errorMsg').classList.remove('show');
+                }, 3000);
+            }
+        }
+
+        // Logout function
+        function logout() {
+            isAuthenticated = false;
+            sessionStorage.removeItem('adminAuth');
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('dashboard').classList.remove('show');
+        }
+
+        // Show dashboard
+        async function showDashboard() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('dashboard').classList.add('show');
+            await loadData();
+            renderStats();
+            renderDonations();
+        }
+
+        // Allow Enter key for login
+        document.getElementById('passwordInput')?.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') login();
+        });
+
+        // Load data
+        async function loadData() {
+            if (USE_GOOGLE_SHEETS && GOOGLE_SHEETS_URL) {
+                try {
+                    const response = await fetch(GOOGLE_SHEETS_URL);
+                    const data = await response.json();
+                    donations = data.map(d => ({
+                        ...d,
+                        date: new Date(d.date).toISOString()
+                    }));
+                    
+                    Object.keys(cases).forEach(caseNum => {
+                        cases[caseNum].collected = donations
+                            .filter(d => d.case == caseNum)
+                            .reduce((sum, d) => sum + d.amount, 0);
+                    });
+                } catch (error) {
+                    console.error('Error loading from Google Sheets:', error);
+                    loadFromLocalStorage();
+                }
+            } else {
+                loadFromLocalStorage();
+            }
+        }
+
+        function loadFromLocalStorage() {
+            const savedCases = localStorage.getItem('cases');
+            const savedDonations = localStorage.getItem('donations');
+            
+            if (savedCases) cases = JSON.parse(savedCases);
+            if (savedDonations) donations = JSON.parse(savedDonations);
+        }
+
+        // Format number
+        function formatNumber(num) {
+            return num.toLocaleString('en-US');
+        }
+
+        // Format date
+        function formatDate(isoString) {
+            const date = new Date(isoString);
+            return date.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric',
+                year: 'numeric'
+            });
+        }
+
+        // Format time
+        function formatTime(isoString) {
+            const date = new Date(isoString);
+            return date.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit'
+            });
+        }
+
+        // Calculate stats
+        function calculateStats() {
+            const totalDonations = donations.length;
+            const totalAmount = donations.reduce((sum, d) => sum + d.amount, 0);
+            const totalTarget = Object.values(cases).reduce((sum, c) => sum + c.target, 0);
+            const totalCollected = Object.values(cases).reduce((sum, c) => sum + c.collected, 0);
+            const avgDonation = totalDonations > 0 ? Math.round(totalAmount / totalDonations) : 0;
+
+            return {
+                totalDonations,
+                totalAmount,
+                totalTarget,
+                totalCollected,
+                avgDonation,
+                remaining: totalTarget - totalCollected
+            };
+        }
+
+        // Render stats
+        function renderStats() {
+            const stats = calculateStats();
+            const grid = document.getElementById('stats-grid');
+            
+            grid.innerHTML = `
+                <div class="stat-card purple">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-title">Total Donations</div>
+                    <div class="stat-value">${stats.totalDonations}</div>
+                </div>
+                <div class="stat-card green">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-title">Total Collected</div>
+                    <div class="stat-value">EGP ${formatNumber(stats.totalCollected)}</div>
+                </div>
+                <div class="stat-card blue">
+                    <div class="stat-icon">🎯</div>
+                    <div class="stat-title">Total Target</div>
+                    <div class="stat-value">EGP ${formatNumber(stats.totalTarget)}</div>
+                </div>
+                <div class="stat-card amber">
+                    <div class="stat-icon">📈</div>
+                    <div class="stat-title">Remaining</div>
+                    <div class="stat-value">EGP ${formatNumber(stats.remaining)}</div>
+                </div>
+                <div class="stat-card cyan">
+                    <div class="stat-icon">💵</div>
+                    <div class="stat-title">Average Donation</div>
+                    <div class="stat-value">EGP ${formatNumber(stats.avgDonation)}</div>
+                </div>
+            `;
+        }
+
+        // Render donations list
+        function renderDonations() {
+            const list = document.getElementById('donations-list');
+            const emptyState = document.getElementById('empty-state');
+            const exportBtn = document.getElementById('export-btn');
+            
+            if (donations.length === 0) {
+                list.innerHTML = '';
+                emptyState.style.display = 'block';
+                exportBtn.style.display = 'none';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            exportBtn.style.display = 'inline-block';
+
+            const sortedDonations = [...donations].sort((a, b) => 
+                new Date(b.date) - new Date(a.date)
+            );
+
+            list.innerHTML = sortedDonations.map((d, index) => `
+                <div class="donation-item">
+                    <div class="donation-number">#${sortedDonations.length - index}</div>
+                    <div class="donation-info">
+                        <div class="donor-name">${d.name}</div>
+                        <div class="donation-meta">
+                            <span class="case-badge">📋 ${cases[d.case]?.title || 'Case ' + d.case}</span>
+                            <span>📅 ${formatDate(d.date)}</span>
+                            <span>🕐 ${formatTime(d.date)}</span>
+                        </div>
+                    </div>
+                    <div class="donation-amount">EGP ${formatNumber(d.amount)}</div>
+                </div>
+            `).join('');
+        }
+
+        // Edit modal functions
+        function openEditModal() {
+            document.getElementById('edit-case-select').value = '1';
+            loadCaseData();
+            document.getElementById('editModal').classList.add('show');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('show');
+        }
+
+        function loadCaseData() {
+            const caseNum = document.getElementById('edit-case-select').value;
+            const c = cases[caseNum];
+            if (c) {
+                document.getElementById('edit-title').value = c.title;
+                document.getElementById('edit-description').value = c.description;
+                document.getElementById('edit-target').value = c.target;
+                document.getElementById('edit-collected').value = c.collected;
+            }
+        }
+
+        function saveEdit() {
+            const caseNum = document.getElementById('edit-case-select').value;
+            cases[caseNum].title = document.getElementById('edit-title').value;
+            cases[caseNum].description = document.getElementById('edit-description').value;
+            cases[caseNum].target = parseInt(document.getElementById('edit-target').value);
+            cases[caseNum].collected = parseInt(document.getElementById('edit-collected').value);
+
+            localStorage.setItem('cases', JSON.stringify(cases));
+            renderStats();
+            closeEditModal();
+            alert('Changes saved successfully!');
+        }
+
+        // Reset function
+        function confirmReset() {
+            if (confirm('⚠️ WARNING: This will delete ALL donation data and reset all cases. This action cannot be undone. Are you absolutely sure?')) {
+                if (confirm('Last chance! Click OK to permanently delete all data.')) {
+                    resetAllData();
+                }
+            }
+        }
+
+        function resetAllData() {
+            // Reset cases
+            cases = {
+                1: { 
+                    title: 'حالة رقم 1',
+                    description: 'سداد دين - مساعدة عيلة محتاجة تسدد دين ضروري عشان يعرفوا يوفروا احتياجاتهم الأساسية',
+                    target: 200000, 
+                    collected: 0 
+                },
+                2: { 
+                    title: 'حالة رقم 2',
+                    description: 'هنقول تفاصيل الحالة دي قريب',
+                    target: 100000, 
+                    collected: 0 
+                },
+                3: { 
+                    title: 'حالة رقم 3',
+                    description: 'هنقول تفاصيل الحالة دي قريب',
+                    target: 100000, 
+                    collected: 0 
+                }
+            };
+            
+            // Clear donations
+            donations = [];
+            
+            // Save to localStorage
+            localStorage.setItem('cases', JSON.stringify(cases));
+            localStorage.setItem('donations', JSON.stringify(donations));
+            
+            // Refresh display
+            renderStats();
+            renderDonations();
+            
+            alert('✅ All data has been reset successfully!');
+        }
+
+        // Export to CSV
+        function exportToCSV() {
+            if (donations.length === 0) {
+                alert('No donations to export');
+                return;
+            }
+
+            let csv = 'Number,Name,Case,Amount,Date,Time\n';
+            
+            donations.forEach((d, index) => {
+                csv += `${index + 1},`;
+                csv += `"${d.name}",`;
+                csv += `"${cases[d.case]?.title || 'Case ' + d.case}",`;
+                csv += `${d.amount},`;
+                csv += `"${formatDate(d.date)}",`;
+                csv += `"${formatTime(d.date)}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', `donations_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Close modal on outside click
+        document.getElementById('editModal')?.addEventListener('click', function(e) {
+            if (e.target === this) closeEditModal();
+        });
+
+        // Auto refresh
+        async function autoRefresh() {
+            if (isAuthenticated) {
+                await loadData();
+                renderStats();
+                renderDonations();
+            }
+        }
+
+        // Initialize
+        window.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            setInterval(autoRefresh, 10000);
+        });
+    </script>
+</body>
+</html>

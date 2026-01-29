@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ساعد وتبرع</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'IBM Plex Sans Arabic', sans-serif;
+            background: #1a1d29;
+            min-height: 100vh;
+            padding: 20px;
+            color: #1a1d29;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding-top: 20px;
+            position: relative;
+        }
+
+        .admin-icon {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 44px;
+            height: 44px;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 1.3em;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .admin-icon:hover {
+            background: rgba(255,255,255,0.25);
+            transform: scale(1.05);
+        }
+
+        .case-card {
+            background: linear-gradient(145deg, #f8f9fb 0%, #ffffff 100%);
+            border-radius: 28px;
+            padding: 40px 32px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+            animation: slideUp 0.6s ease-out;
+        }
+
+        .case-title {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: #1a1d29;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .case-description {
+            color: #64748b;
+            line-height: 1.8;
+            font-size: 0.95em;
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .amounts-section {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .amount-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            font-size: 0.95em;
+        }
+
+        .amount-label {
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .amount-value {
+            font-weight: 700;
+            color: #1a1d29;
+            font-size: 1.05em;
+        }
+
+        .progress-section {
+            margin-bottom: 28px;
+        }
+
+        .name-section {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .name-label {
+            display: block;
+            color: #64748b;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .progress-bar-container {
+            background: #e2e8f0;
+            height: 8px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%);
+            border-radius: 10px;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .progress-text {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+
+        .donation-prompt {
+            text-align: center;
+            font-size: 0.95em;
+            font-weight: 600;
+            color: #1a1d29;
+            margin-bottom: 16px;
+        }
+
+        .name-input {
+            width: 100%;
+            padding: 14px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-family: 'IBM Plex Sans Arabic', sans-serif;
+            font-size: 1em;
+            font-weight: 500;
+            color: #1a1d29;
+            background: white;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .name-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background: #f8fafc;
+        }
+
+        .name-input::placeholder {
+            color: #94a3b8;
+        }
+
+        .quick-amounts {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .quick-amount-btn {
+            padding: 14px;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            color: #3b82f6;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'IBM Plex Sans Arabic', sans-serif;
+        }
+
+        .quick-amount-btn:hover {
+            border-color: #3b82f6;
+            background: #eff6ff;
+            transform: translateY(-2px);
+        }
+
+        .quick-amount-btn.selected {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+
+        .amount-input-container {
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        .amount-input {
+            width: 100%;
+            padding: 16px 60px 16px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-family: 'IBM Plex Sans Arabic', sans-serif;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #1a1d29;
+            background: white;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .amount-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background: #f8fafc;
+        }
+
+        .amount-input::placeholder {
+            color: #cbd5e1;
+            font-weight: 500;
+        }
+
+        .currency-label {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            font-size: 0.95em;
+            font-weight: 600;
+        }
+
+        .donate-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 1.1em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            font-family: 'IBM Plex Sans Arabic', sans-serif;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .donate-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(59, 130, 246, 0.4);
+        }
+
+        .donate-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .success-message {
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+            color: #166534;
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-top: 16px;
+            text-align: center;
+            font-weight: 600;
+            display: none;
+            animation: slideDown 0.5s ease-out;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .case-card {
+                padding: 32px 24px;
+            }
+
+            .quick-amounts {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="admin-secure.html" class="admin-icon">🔐</a>
+    
+    <div class="container">
+        <div id="cases-container">
+            <!-- Cases will be generated by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        // ========== CONFIGURATION ==========
+        const GOOGLE_SHEETS_URL = '';
+        const USE_GOOGLE_SHEETS = false;
+        const INSTAPAY_LINK = 'https://ipn.eg/S/arashidy91/instapay/4VfMhW';
+        // ===================================
+
+        let cases = {
+            1: { 
+                title: 'حالة رقم 1',
+                description: 'سداد دين - مساعدة عيلة محتاجة تسدد دين ضروري عشان يعرفوا يوفروا احتياجاتهم الأساسية',
+                target: 200000, 
+                collected: 0 
+            },
+            2: { 
+                title: 'حالة رقم 2',
+                description: 'هنقول تفاصيل الحالة دي قريب',
+                target: 100000, 
+                collected: 0 
+            },
+            3: { 
+                title: 'حالة رقم 3',
+                description: 'هنقول تفاصيل الحالة دي قريب',
+                target: 100000, 
+                collected: 0 
+            }
+        };
+
+        let donations = [];
+        let selectedAmounts = {1: null, 2: null, 3: null};
+
+        // Load data
+        function loadData() {
+            const savedCases = localStorage.getItem('cases');
+            const savedDonations = localStorage.getItem('donations');
+            
+            if (savedCases) cases = JSON.parse(savedCases);
+            if (savedDonations) donations = JSON.parse(savedDonations);
+        }
+
+        // Save data
+        async function saveData() {
+            localStorage.setItem('cases', JSON.stringify(cases));
+            localStorage.setItem('donations', JSON.stringify(donations));
+            
+            if (USE_GOOGLE_SHEETS && GOOGLE_SHEETS_URL && donations.length > 0) {
+                try {
+                    const lastDonation = donations[donations.length - 1];
+                    await fetch(GOOGLE_SHEETS_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            action: 'add_donation',
+                            ...lastDonation
+                        })
+                    });
+                } catch (error) {
+                    console.error('Error saving to Google Sheets:', error);
+                }
+            }
+        }
+
+        // Format number
+        function formatNumber(num) {
+            return num.toLocaleString('ar-EG');
+        }
+
+        // Select quick amount
+        function selectAmount(caseNum, amount) {
+            selectedAmounts[caseNum] = amount;
+            
+            // Update UI
+            const buttons = document.querySelectorAll(`#case${caseNum} .quick-amount-btn`);
+            buttons.forEach(btn => btn.classList.remove('selected'));
+            event.target.classList.add('selected');
+            
+            // Update input
+            document.getElementById(`case${caseNum}-amount`).value = amount;
+        }
+
+        // Generate case card HTML
+        function generateCaseCard(caseNum) {
+            const c = cases[caseNum];
+            const remaining = Math.max(0, c.target - c.collected);
+            const percentage = Math.min((c.collected / c.target) * 100, 100);
+
+            return `
+                <div class="case-card" id="case${caseNum}">
+                    <h2 class="case-title">${c.title}</h2>
+                    <p class="case-description">${c.description}</p>
+
+                    <div class="amounts-section">
+                        <div class="amount-row">
+                            <span class="amount-label">المبلغ المطلوب:</span>
+                            <span class="amount-value">${formatNumber(c.target)} جنيه</span>
+                        </div>
+                        <div class="amount-row">
+                            <span class="amount-label">اللي اتجمع لحد دلوقتي:</span>
+                            <span class="amount-value" id="case${caseNum}-collected">${formatNumber(c.collected)} جنيه</span>
+                        </div>
+                        <div class="amount-row">
+                            <span class="amount-label">الباقي:</span>
+                            <span class="amount-value" id="case${caseNum}-remaining">${formatNumber(remaining)} جنيه</span>
+                        </div>
+                    </div>
+
+                    <div class="progress-section">
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" id="case${caseNum}-progress" style="width: ${percentage}%;"></div>
+                        </div>
+                        <div class="progress-text" id="case${caseNum}-percent">${Math.round(percentage)}%</div>
+                    </div>
+
+                    <div class="name-section">
+                        <label class="name-label">الاسم 🙏🏻</label>
+                        <input 
+                            type="text" 
+                            id="case${caseNum}-name" 
+                            class="name-input" 
+                            placeholder="Name"
+                        >
+                    </div>
+
+                    <div class="quick-amounts">
+                        <button class="quick-amount-btn" onclick="selectAmount(${caseNum}, 100)">100 جنيه</button>
+                        <button class="quick-amount-btn" onclick="selectAmount(${caseNum}, 500)">500 جنيه</button>
+                        <button class="quick-amount-btn" onclick="selectAmount(${caseNum}, 1000)">1000 جنيه</button>
+                        <button class="quick-amount-btn" onclick="selectAmount(${caseNum}, 2000)">2000 جنيه</button>
+                        <button class="quick-amount-btn" onclick="selectAmount(${caseNum}, 5000)">5000 جنيه</button>
+                        <button class="quick-amount-btn" onclick="selectAmount(${caseNum}, 10000)">10000 جنيه</button>
+                    </div>
+
+                    <div class="amount-input-container">
+                        <input 
+                            type="number" 
+                            id="case${caseNum}-amount" 
+                            class="amount-input" 
+                            placeholder="Another Amount"
+                            min="1"
+                        >
+                        <span class="currency-label">جنيه</span>
+                    </div>
+
+                    <button class="donate-btn" onclick="processDonation(${caseNum})">
+                        InstaPay
+                    </button>
+
+                    <div class="success-message" id="case${caseNum}-success">
+                        ✓ ربنا يبارك فيك! اتسجل تبرعك
+                    </div>
+                </div>
+            `;
+        }
+
+        // Render all cases
+        function renderCases() {
+            const container = document.getElementById('cases-container');
+            container.innerHTML = '';
+            for (let i = 1; i <= 3; i++) {
+                container.innerHTML += generateCaseCard(i);
+            }
+        }
+
+        // Update case display
+        function updateCase(caseNum) {
+            const c = cases[caseNum];
+            const remaining = Math.max(0, c.target - c.collected);
+            const percentage = Math.min((c.collected / c.target) * 100, 100);
+
+            document.getElementById(`case${caseNum}-collected`).textContent = formatNumber(c.collected) + ' جنيه';
+            document.getElementById(`case${caseNum}-remaining`).textContent = formatNumber(remaining) + ' جنيه';
+            document.getElementById(`case${caseNum}-progress`).style.width = percentage + '%';
+            document.getElementById(`case${caseNum}-percent`).textContent = Math.round(percentage) + '%';
+        }
+
+        // Process donation
+        async function processDonation(caseNum) {
+            const nameInput = document.getElementById(`case${caseNum}-name`);
+            const amountInput = document.getElementById(`case${caseNum}-amount`);
+            const name = nameInput.value.trim() || 'متبرع';
+            const amount = parseInt(amountInput.value);
+
+            if (!amount || amount <= 0) {
+                alert('من فضلك اكتب مبلغ صح');
+                return;
+            }
+
+            // Add donation
+            const donation = {
+                case: caseNum,
+                name: name,
+                amount: amount,
+                date: new Date().toISOString()
+            };
+            donations.push(donation);
+
+            // Update collected
+            cases[caseNum].collected += amount;
+            
+            // Save
+            await saveData();
+            
+            // Update display
+            updateCase(caseNum);
+            
+            // Show success
+            const successMsg = document.getElementById(`case${caseNum}-success`);
+            successMsg.classList.add('show');
+            setTimeout(() => {
+                successMsg.classList.remove('show');
+            }, 3000);
+
+            // Clear inputs
+            nameInput.value = '';
+            amountInput.value = '';
+            selectedAmounts[caseNum] = null;
+            
+            // Clear selected button
+            const buttons = document.querySelectorAll(`#case${caseNum} .quick-amount-btn`);
+            buttons.forEach(btn => btn.classList.remove('selected'));
+
+            // Open InstaPay
+            setTimeout(() => {
+                window.open(INSTAPAY_LINK, '_blank');
+            }, 500);
+        }
+
+        // Initialize
+        window.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            renderCases();
+        });
+    </script>
+</body>
+</html>
